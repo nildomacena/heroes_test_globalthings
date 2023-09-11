@@ -7,30 +7,22 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ConnectionService {
   connected = false;
-  test = false;
   status$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   constructor() {
     this.checkConnection();
     Network.getStatus().then(status => {
       this.connected = status.connected;
-      this.status$.next(this.test ? false : status.connected);
+      this.status$.next(status.connected);
     });
 
     Network.addListener('networkStatusChange', status => {
       this.connected = status.connected;
-      this.status$.next(this.test ? false : status.connected);
+      this.status$.next(status.connected);
     });
-
-    /*  if (this.test) {
-       setTimeout(() => {
-         this.status$.next(true);
-       }, 5000);
-     } */
   }
 
   async checkConnection() {
-    if (this.test) return false;
 
     try {
       const status = await Network.getStatus();
