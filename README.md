@@ -1,6 +1,8 @@
 # Projeto de Teste para Vaga de Desenvolvedor Ionic na Globalthings
 
-Este projeto é um teste para a vaga de desenvolvedor Ionic na empresa Globalthings. A aplicação consiste em uma plataforma de gerenciamento de heróis e categorias, com a funcionalidade de sincronização de dados e operações CRUD. 
+Este projeto foi desenvolvido por Ednildo Macena.
+
+O projeto trata-se de teste para a vaga de desenvolvedor Ionic na empresa Globalthings. A aplicação consiste em uma plataforma de gerenciamento de heróis e categorias, com a funcionalidade de sincronização de dados e operações CRUD. 
 
 ## Layout
 
