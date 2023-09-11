@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.globalthings.heroes_app;
 
 import com.getcapacitor.BridgeActivity;
 

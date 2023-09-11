@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">heroes_test</string>
-    <string name="title_activity_main">heroes_test</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="app_name">Heroes App</string>
+    <string name="title_activity_main">Heroes App</string>
+    <string name="package_name">com.globalthings.heroes_app</string>
+    <string name="custom_url_scheme">com.globalthings.heroes_app</string>
 </resources>
