@@ -1,0 +1,46 @@
+<div class="card" *ngIf="!isLoading; else loadingCard">
+  <div class="card-title">
+    {{hero.Name}}
+    <ion-badge *ngIf="hero.Active" color="success">Ativo</ion-badge>
+    <ion-badge *ngIf="!hero.Active" color="danger">Inativo</ion-badge>
+  </div>
+  <div class="card-content">
+    <div class="pending" *ngIf="isPending">Sincronização pendente</div>
+    <div class="category">Super Poder: {{hero.Category.Name}}</div>
+  </div>
+  <div class="image-category">
+    <img [src]="'assets/imgs/categories/'+hero.Category.Id+'.png'" alt="" (error)="handleImgError($event)" />
+  </div>
+  <hr />
+  <div class="card-actions" *ngIf="!isSyncing">
+    <ion-button icon-start *ngIf="!isPending" color="primary" round (click)="editHero()">
+      Editar
+    </ion-button>
+    <ion-button color="danger" round (click)="deleteHero()">
+      Excluir
+    </ion-button>
+  </div>
+  <div class="card-actions" *ngIf="isSyncing">
+    <h3>Sincronizando...</h3>
+  </div>
+</div>
+<ng-template #loadingCard>
+  <div class="card">
+    <div class="card-title skeleton">
+      <ion-skeleton-text [animated]="true" class="title-skeleton"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" class="title-skeleton" style="width: 50px;"></ion-skeleton-text>
+    </div>
+    <div class="card-content">
+      <div class="category-skeleton">
+        <ion-skeleton-text [animated]="true" class="title-skeleton"></ion-skeleton-text>
+      </div>
+      <div class="category-skeleton">
+        <ion-skeleton-text [animated]="true" class="icon-skeleton"></ion-skeleton-text>
+      </div>
+    </div>
+    <div class="card-actions-skeleton">
+      <ion-skeleton-text [animated]="true" class="action-skeleton"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" class="action-skeleton"></ion-skeleton-text>
+    </div>
+  </div>
+</ng-template>

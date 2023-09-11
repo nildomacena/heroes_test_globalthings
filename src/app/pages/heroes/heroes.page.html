@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar *ngIf="!showToolbar;">
+    <ion-title style="margin-left: 42px;">Hérois</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSearchbar(true)">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="showToolbar;">
+    <ion-searchbar placeholder="Pesquise nome ou categoria" (ionInput)="filterHeroes($event)"
+      [debounce]="500"></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSearchbar(false)">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addHero()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">heroes</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="heroes-list">
+    <ng-container *ngIf="heroes.length === 0; else heroList">
+      <hero-card *ngFor="let item of listLoading" [isLoading]="true"></hero-card>
+    </ng-container>
+    <ng-template #heroList>
+      <hero-card *ngFor="let hero of filteredHeroes" [hero]="hero" [isPending]="hero.PendingSync || false"
+        (edit)="editHero($event)" (delete)="deleteHero($event)"></hero-card>
+    </ng-template>
+  </div>
+
+</ion-content>

@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="cancel()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Cadastrar Categoria</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="saveCategory()">
+        <ion-icon name="save-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input labelPlacement="stacked" label="Digite o nome da categoria" [(ngModel)]="name" placeholder="Nome da Categoria"></ion-input>
+  </ion-item>
+</ion-content>

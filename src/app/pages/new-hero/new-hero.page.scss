@@ -1,0 +1,23 @@
+.submit {
+    padding:  20px 5px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+ion-button {
+    height: 50px;
+    width: 100%;
+}
+
+ion-item {
+    padding-left: 0 !important;
+}
+
+ion-input{
+    text-align: right;
+}
+
+.ng-invalid.ng-touched {
+    color: rgba(255, 0, 0, 10);
+}

@@ -1,0 +1,109 @@
+.card {
+  margin: 30px 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-content {
+  padding: 16px;
+}
+
+.card-content h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.card-content p {
+  font-size: 16px;
+  color: #555;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 10px 10px;
+  font-size: 20px;
+  background-color: #333ba7b2;
+  color: white;
+  font-weight: bold;
+}
+
+img {
+  max-width: 70px;
+}
+
+.category {
+  font-size: 18px;
+  text-align: center;
+}
+
+.image-category {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.card-actions button {
+  width: 100%;
+  margin: 0 20px;
+}
+
+.pending {
+  text-align: center;
+  margin-bottom: 10px;
+  background-color: cornflowerblue;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+ion-button {
+  width: 100% !important;
+  margin: 0 10px !important;
+}
+
+.card-title .skeleton {}
+
+.title-skeleton {
+  height: 20px;
+  width: 50%;
+  border-radius: 5px;
+}
+
+.category-skeleton {
+  display: flex;
+  justify-content: center;
+}
+
+.icon-skeleton {
+  border-radius: 5px;
+  width: 70px;
+  height: 70px;
+}
+
+.card-actions-skeleton {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.action-skeleton {
+  width: 100%;
+  margin: 0 20px;
+  height: 40px;
+  border-radius: 5px;
+}

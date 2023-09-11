@@ -1,0 +1,50 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Categorias</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addCategory()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+
+  <ng-container *ngIf="!categories || categories.length <= 0; else listCategories">
+    <ion-list *ngFor="let a of listLoading">
+      <ion-item>
+        <ion-thumbnail slot="start">
+          <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+        </ion-thumbnail>
+        <ion-label>
+          <h3>
+            <ion-skeleton-text [animated]="true" style="width: 30px;"></ion-skeleton-text>
+          </h3>
+          <p>
+            <ion-skeleton-text [animated]="true" style="width: 50%;"></ion-skeleton-text>
+          </p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #listCategories>
+    <ion-item-sliding *ngFor="let category of categories" #itemSliding>
+      <ion-item>
+        <ion-avatar slot="start">
+          <img [src]="'assets/imgs/categories/'+category.Id+'.png'" (error)="handleImgError($event)" />
+        </ion-avatar>
+        <ion-label>
+          <h2><strong>ID: {{category.Id}}</strong></h2>
+          <h2>{{category.Name}}</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item-options>
+        <ion-item-option expandable (click)="editCategory(category)">Editar</ion-item-option>
+        <ion-item-option color="danger" (click)="deleteCategory(category)">Deletar</ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ng-template>
+</ion-content>

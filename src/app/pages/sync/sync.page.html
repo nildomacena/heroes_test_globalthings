@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Sincronização</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">sync</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-segment [(ngModel)]="segment" value="heroes">
+    <ion-segment-button value="heroes" (click)="onSelectSegment($event)">
+      <ion-label>Heróis</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="categories" (click)="onSelectSegment($event)">
+      <ion-label>Categorias</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <ng-container *ngIf="segment == 'heroes'; else categories">
+    <ion-card *ngFor="let hero of heroOperations">
+      <ion-card-header>
+        <ion-card-title>
+          {{hero.entity.Name}}
+          <!--  <ion-button color="danger" shape="round" size="small">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button> -->
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p>Operação: {{formatOperation(hero.operation)}}</p>
+        <p>
+          <ion-label>Categoria: </ion-label>
+          <ion-text>{{hero.entity.Category.Name}}</ion-text>
+        </p>
+      </ion-card-content>
+      <ion-button fill="clear" color="danger">Excluir</ion-button>
+
+    </ion-card>
+  </ng-container>
+  <ng-template #categories>
+    <ion-card *ngFor="let category of categoryOperations">
+      <ion-card-header>
+        <ion-card-title>{{category.entity.Name}}</ion-card-title>
+        <ion-card-subtitle>Operação: {{formatOperation(category.operation)}} </ion-card-subtitle>
+      </ion-card-header>
+    </ion-card>
+  </ng-template>
+</ion-content>

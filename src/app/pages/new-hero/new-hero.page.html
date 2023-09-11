@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="cancel()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Adicionar Herói</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="submitForm()">
+        <ion-icon name="save-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <!-- <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/heroes"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Adicionar Herói</ion-title>
+  </ion-toolbar> -->
+</ion-header>
+
+
+<ion-content padding>
+
+  <form [formGroup]="form" (submit)="submitForm()">
+    <ion-list>
+      <ion-item>
+        <ion-input required label="Nome do Herói" type="text" formControlName="name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-select label="Categoria" required formControlName="category" cancelText="Cancelar" okText="OK"
+          formControlName="category" justify="space-between" label="Categoria" placeholder="Selecione">
+          <ion-select-option *ngFor="let category of categories"
+            [value]="category">{{category.Name}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-toggle formControlName="active" mode="ios">Ativo?</ion-toggle>
+      </ion-item>
+      <div class="submit">
+        <ion-button type="submit" shape="round" expand="full" [disabled]="loading">
+          {{loading? 'Enviando dados...': hero ? 'Editar Herói': 'Adicionar Herói'}}
+        </ion-button>
+      </div>
+    </ion-list>
+  </form>
+</ion-content>
