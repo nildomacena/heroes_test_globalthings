@@ -15,9 +15,10 @@ import { ConnectionService } from 'src/app/services/connection.service';
 })
 export class CategoriesPage implements OnInit {
   @ViewChildren(IonItemSliding) slidingItems?: QueryList<IonItemSliding>;
-  categories: Category[] = [];
+  categories?: Category[];
   listLoading = [1, 2, 3, 4, 5, 6];
   showedSlidingItems = false;
+  error = false;
 
   constructor(
     private heroesService: HeroesService,
@@ -31,18 +32,52 @@ export class CategoriesPage implements OnInit {
 
   ngOnInit() {
     this.getCategories();
+    this.heroesService.categoriesUpdated$.subscribe(() => {
+      this.getCategories();
+    });
   }
 
   isConnected(): Promise<boolean> {
     return this.connectionService.checkConnection();
   }
 
-  async getCategories() {
-    try {
-      this.heroesService.getCategories().subscribe((data: any) => {
+  async getCategories(event?: any) {
+    this.error = false;
+    if (await this.isConnected()) {
+      try {
+        this.heroesService.getCategories().subscribe((data: any) => {
+          this.categories = data;
+
+          this.categories?.sort((a, b) => {
+            if (a.Id < b.Id) return -1;
+            if (a.Id > b.Id) return 1;
+            return 0;
+          });
+          if (!this.showedSlidingItems) {
+            setTimeout(() => {
+              this.openSlidingItem();
+              this.showedSlidingItems = true;
+            }, 500);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        this.error = true;
+        showToast({
+          controller: this.toastrCtrl,
+          message: "Não foi possível carregar as Categorias",
+          duration: 3000,
+          position: "bottom",
+        });
+      } finally {
+        event?.target.complete();
+      }
+    }
+    else {
+      this.offlineService.getCachedCategories().then((data) => {
+        event?.target.complete();
 
         this.categories = data;
-
         this.categories.sort((a, b) => {
           if (a.Id < b.Id) return -1;
           if (a.Id > b.Id) return 1;
@@ -54,16 +89,20 @@ export class CategoriesPage implements OnInit {
             this.showedSlidingItems = true;
           }, 500);
         }
+        showToast({
+          controller: this.toastrCtrl,
+          message: 'Dados carregados localmente!',
+        });
+      }, async (error) => {
+        console.error(error);
+        this.error = true;
+        showToast({
+          controller: this.toastrCtrl,
+          message: "Não foi possível carregar as Categorias",
+          duration: 3000,
+          position: "bottom",
+        });
       });
-    } catch (error) {
-      console.error(error);
-      showToast({
-        controller: this.toastrCtrl,
-        message: "Não foi possível carregar as Categorias",
-        duration: 3000,
-        position: "bottom",
-      });
-
     }
   }
 
@@ -156,6 +195,8 @@ export class CategoriesPage implements OnInit {
       operation: "delete",
       entity: category,
     });
+    await this.offlineService.deleteCachedCategory(category);
+    this.getCategories();
 
     showToast({
       controller: this.toastrCtrl,

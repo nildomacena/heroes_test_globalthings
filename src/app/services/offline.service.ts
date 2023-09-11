@@ -10,8 +10,12 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class OfflineService {
   private _storage: Storage | null = null;
-  heroes$: BehaviorSubject<SyncOperation<Hero>[]> = new BehaviorSubject<SyncOperation<Hero>[]>([]);
-  categories$: BehaviorSubject<SyncOperation<Category>[]> = new BehaviorSubject<SyncOperation<Category>[]>([]);
+  heroesSyncOperations$: BehaviorSubject<SyncOperation<Hero>[]> = new BehaviorSubject<SyncOperation<Hero>[]>([]);
+  categoriesSyncOperations$: BehaviorSubject<SyncOperation<Category>[]> = new BehaviorSubject<SyncOperation<Category>[]>([]);
+  keyOperationsCategories = 'operations_categories';
+  keyOperationsHeroes = 'operations_heroes';
+  keyHeroesOffline = 'heroes_offline';
+  keyCategoriesOffline = 'categories_offline';
 
   constructor(private storage: Storage) {
     this.init();
@@ -20,57 +24,125 @@ export class OfflineService {
   async init() {
     const storage = await this.storage.create();
     this._storage = storage;
-    this._storage.set('heroes', []);
-    this._storage.set('categories', []);
-    const heroes = await this.storage?.get('heroes') ?? [];
-    const categories = await this.storage?.get('categories') ?? [];
-    this.heroes$.next(heroes);
-    this.categories$.next(categories);
+    const heroes = await this.storage?.get(this.keyOperationsHeroes) ?? [];
+    const categories = await this.storage?.get(this.keyOperationsCategories) ?? [];
+    this.heroesSyncOperations$.next(heroes);
+    this.categoriesSyncOperations$.next(categories);
   }
 
-  async getHeroes(): Promise<SyncOperation<Hero>[]> {
-    const heroes = await this.storage?.get('heroes') ?? [];
+
+  cacheHeroes(heroes: Hero[]) {
+    this.storage?.set(this.keyHeroesOffline, heroes);
+  }
+
+  async getCachedHeroes(): Promise<Hero[]> {
+    const heroes = await this.storage?.get(this.keyHeroesOffline);
+    return heroes;
+  }
+
+  async deleteCachedHero(hero: Hero) {
+    const heroes = await this.storage?.get(this.keyHeroesOffline);
+    if (!heroes) return;
+    const index = heroes.findIndex((h: Hero) => {
+      return hero.Id === h.Id;
+    });
+    heroes.splice(index, 1);
+    this.storage?.set(this.keyHeroesOffline, heroes);
+  }
+
+  async updateCachedHero(hero: Hero) {
+    const heroes = await (this.storage?.get(this.keyHeroesOffline) as Promise<Hero[] | undefined>);
+    if (!heroes) return;
+    const index = heroes.findIndex((h: Hero) => {
+      return hero.Id === h.Id;
+    });
+    heroes[index] = hero;
+    this.storage?.set(this.keyHeroesOffline, heroes);
+  }
+
+  async getHeroesSyncOperations(): Promise<SyncOperation<Hero>[]> {
+    const heroes = await this.storage?.get(this.keyOperationsHeroes) ?? [];
     return heroes;
   }
 
   async saveHeroOperation(data: SyncOperation<Hero>) {
-    const heroes = await this.storage?.get('heroes');
+    const heroes = await this.storage?.get(this.keyOperationsHeroes);
     if (!heroes) {
-      await this.storage?.set('heroes', [data]);
-      return this.heroes$.next([data]);
+      await this.storage?.set(this.keyOperationsHeroes, [data]);
+      return this.heroesSyncOperations$.next([data]);
     }
     else {
-      await this.storage?.set('heroes', [...heroes, data]);
-      return this.heroes$.next([...heroes, data]);
+      await this.storage?.set(this.keyOperationsHeroes, [...heroes, data]);
+      return this.heroesSyncOperations$.next([...heroes, data]);
     }
   }
-  
-  deleteOperationHero(operation: SyncOperation<Hero>) {
-    const heroes = this.heroes$.getValue();
-    const index = heroes.findIndex((hero) =>{
 
+  deleteOperationHero(operation: SyncOperation<Hero>) {
+    const heroes = this.heroesSyncOperations$.getValue();
+    const index = heroes.findIndex((hero) => {
+      return operation.date === hero.date;
     });
     heroes.splice(index, 1);
-    this.storage?.set('heroes', heroes);
-    this.heroes$.next(heroes);
+    this.storage?.set(this.keyOperationsHeroes, heroes);
+    this.heroesSyncOperations$.next(heroes);
   }
 
-  async getCategories(): Promise<SyncOperation<Category>[]> {
-    const categories = await this.storage?.get('categories') ?? [];
+
+  cacheCategories(categories: Category[]) {
+    this.storage?.set(this.keyCategoriesOffline, categories);
+  }
+
+  async getCachedCategories(): Promise<Category[]> {
+    const categories = await this.storage?.get(this.keyCategoriesOffline);
     return categories;
   }
 
+  async deleteCachedCategory(category: Category) {
+    const categories = await this.storage?.get(this.keyCategoriesOffline);
+    if (!categories) return;
+    const index = categories.findIndex((c: Category) => {
+      return category.Id === c.Id;
+    });
+    categories.splice(index, 1);
+    this.storage?.set(this.keyCategoriesOffline, categories);
+  }
+
+  async updateCachedCategory(category: Category) {
+    const categories = await (this.storage?.get(this.keyCategoriesOffline) as Promise<Category[] | undefined>);
+    if (!categories) return;
+    const index = categories.findIndex((c: Category) => {
+      return category.Id === c.Id;
+    });
+    categories[index] = category;
+    this.storage?.set(this.keyCategoriesOffline, categories);
+  }
+
+
+  async getCategoriesSyncOperations(): Promise<SyncOperation<Category>[]> {
+    const categories = await this.storage?.get(this.keyOperationsCategories) ?? [];
+    return categories;
+  }
 
   async saveCategoryOperation(data: SyncOperation<Category>) {
-    const categories = await this.storage?.get('categories');
+    const categories = await this.storage?.get(this.keyOperationsCategories);
     if (!categories) {
-      await this.storage?.set('categories', [data]);
-      return this.categories$.next([data]);
+      await this.storage?.set(this.keyOperationsCategories, [data]);
+      return this.categoriesSyncOperations$.next([data]);
     }
     else {
-      await this.storage?.set('categories', [...categories, data]);
-      return this.categories$.next([...categories, data]);
+      await this.storage?.set(this.keyOperationsCategories, [...categories, data]);
+      return this.categoriesSyncOperations$.next([...categories, data]);
     }
+  }
+
+  deleteOperationCategory(operation: SyncOperation<Category>) {
+    const categories = this.categoriesSyncOperations$.getValue();
+    const index = categories.findIndex((category) => {
+      return operation.date === category.date;
+    });
+    categories.splice(index, 1);
+    this.storage?.set(this.keyOperationsCategories, categories);
+    this.categoriesSyncOperations$.next(categories);
   }
 
 }

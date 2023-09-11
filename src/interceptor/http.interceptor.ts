@@ -8,7 +8,6 @@ export class AuthInterceptor implements HttpInterceptor {
             'accessKey': '6d32f413868a4327aab124190fa83b2c',
         });
         request = request.clone({ headers });
-
         return next.handle(request);
     }
 }

@@ -16,7 +16,7 @@ import { NewHeroPage } from '../new-hero/new-hero.page';
   styleUrls: ['./heroes.page.scss'],
 })
 export class HeroesPage implements OnInit {
-  status = '';
+  isConnected?: boolean;
   heroes: Hero[] = [];
   categories: Category[] | undefined;
   filteredHeroes: Hero[] = [];
@@ -37,6 +37,26 @@ export class HeroesPage implements OnInit {
 
   ngOnInit() {
     this.getCategories();
+    this.connectionService.status$.subscribe((status) => {
+      const previousStatus = this.isConnected;
+      this.isConnected = status;
+      console.log('isConnected: ', this.isConnected);
+      if (previousStatus === false && this.isConnected === true) {
+        this.getHeroes();
+        this.getCategories();
+        showToast({
+          controller: this.toastCtrl,
+          message: 'Você está conectado novamente!',
+          color: 'success'
+        });
+      }
+    });
+
+    this.heroesService.heroesUpdated$.subscribe(() => {
+      console.log('heroes updated')
+      this.getHeroes();
+    });
+
 
     //Timeout para mostrar o layout de quando os dados estão carregando
     setTimeout(() => {
@@ -44,23 +64,46 @@ export class HeroesPage implements OnInit {
     }, 500);
   }
 
-
-  isConnected(): Promise<boolean> {
-    return this.connectionService.checkConnection();
+  async getHeroes(event?: any): Promise<void> {
+    if (this.isConnected) {
+      this.heroesService.getHeroes().subscribe((data: any) => {
+        this.filteredHeroes = this.heroes = data;
+        event?.target.complete();
+        return;
+      });
+      return;
+    }
+    else {
+      this.filteredHeroes = this.heroes = await this.offlineService.getCachedHeroes()
+      showToast({
+        controller: this.toastCtrl,
+        message: 'Dados carregados localmente!',
+      });
+      event?.target.complete();
+      return;
+    }
   }
 
-  getHeroes() {
-    this.heroesService.getHeroes().subscribe((data: any) => {
-      this.filteredHeroes = this.heroes = data;
-      console.log('data', data);
-    });
-  }
-
-  getCategories() {
-    this.heroesService.getCategories().subscribe((data: any) => {
-      this.categories = data;
-      console.log('data', data);
-    });
+  async getCategories() {
+    if (this.isConnected) {
+      try {
+        this.heroesService.getCategories().subscribe((data: any) => {
+          this.categories = data;
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    else {
+      this.offlineService.getCachedCategories().then((data) => {
+        this.categories = data;
+        this.categories.sort((a, b) => {
+          if (a.Id < b.Id) return -1;
+          if (a.Id > b.Id) return 1;
+          return 0;
+        });
+      });
+    }
   }
 
   alertError(): Promise<boolean> {
@@ -127,7 +170,7 @@ export class HeroesPage implements OnInit {
     });
     loading.present();
 
-    if (!(await this.isConnected())) {
+    if (!(await this.isConnected)) {
       loading.dismiss();
       const result = await this.alertError();
       if (!result) return;
@@ -165,6 +208,8 @@ export class HeroesPage implements OnInit {
     }
     try {
       await this.offlineService.saveHeroOperation(data);
+      await this.offlineService.deleteCachedHero(hero);
+      this.getHeroes();
       showToast({
         controller: this.toastCtrl,
         message: 'Herói excluído localmente!',

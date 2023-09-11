@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, delay, map, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, delay, map, timeout } from 'rxjs';
 import { Hero } from '../interfaces/hero';
 import { Category } from '../interfaces/category';
+import { OfflineService } from './offline.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +11,22 @@ import { Category } from '../interfaces/category';
 export class HeroesService {
   delayTime = 3000;
   baseUrl = 'https://candidato02.globalthings.net/api/';
-  constructor(private http: HttpClient) { }
+  heroesUpdated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  categoriesUpdated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
+  constructor(private http: HttpClient, private offlineService: OfflineService) { }
 
 
   /* Heroes */
 
   getHeroes(): Observable<Hero[]> {
     return this.http.get(this.baseUrl + 'Heroes').pipe(
-      map((data: any) => data.Items, timeout(this.delayTime))
+      map((data: any) => {
+        if (data.Items.length > 0) {
+          this.offlineService.cacheHeroes(data.Items);
+        }
+        return data.Items;
+      }, timeout(this.delayTime))
     );
   }
 
@@ -32,7 +41,10 @@ export class HeroesService {
         Name: data.name,
         CategoryId: data.category.Id,
         Active: data.active,
-      }).pipe(timeout(this.delayTime));
+      }).pipe(map((hero) => {
+        this.heroesUpdated$.next(true);
+        return hero;
+      }));
   }
 
   updateHero(data: {
@@ -46,13 +58,22 @@ export class HeroesService {
         Name: data.name,
         CategoryId: data.category.Id,
         Active: data.active,
-      }).pipe(timeout(this.delayTime));
+      }).pipe(timeout(this.delayTime)).pipe(map((hero) => {
+        this.heroesUpdated$.next(true);
+        return hero;
+      }));
   }
 
 
   deleteHero(heroId: number): Observable<any> {
     return this.http
-      .delete(this.baseUrl + "Heroes/" + heroId).pipe(timeout(this.delayTime));
+      .delete(this.baseUrl + "Heroes/" + heroId).pipe(timeout(this.delayTime)).pipe(map((hero) => {
+        this.heroesUpdated$.next(true);
+        return hero;
+      })).pipe(map((hero) => {
+        this.heroesUpdated$.next(true);
+        return hero;
+      }));
   }
 
 
@@ -60,14 +81,22 @@ export class HeroesService {
   /* Categories */
   getCategories(): Observable<Category[]> {
     return this.http.get(this.baseUrl + 'Category').pipe(
-      map((data: any) => data.Items), timeout(this.delayTime)
+      map((data: any) => {
+        if (data.Items.length > 0) {
+          this.offlineService.cacheCategories(data.Items);
+        }
+        return data.Items
+      }), timeout(this.delayTime)
     );
   }
 
   createCategory(name: string): Observable<Category> {
     return this.http.post<Category>(this.baseUrl + 'Category', {
       Name: name,
-    }).pipe(timeout(this.delayTime), delay(4000));
+    }).pipe(timeout(this.delayTime), delay(4000)).pipe(map((category) => {
+      this.categoriesUpdated$.next(true);
+      return category;
+    }));
   }
 
   updateCategory(data: {
@@ -76,11 +105,20 @@ export class HeroesService {
   }): Observable<Category> {
     return this.http.put<Category>(this.baseUrl + 'Category/' + data.categoryId, {
       Name: data.name,
-    }).pipe(timeout(this.delayTime));
+    }).pipe(timeout(this.delayTime)).pipe(map((category) => {
+      this.categoriesUpdated$.next(true);
+      return category;
+    }));
   }
 
   deleteCategory(categoryId: number): Observable<any> {
-    return this.http.delete(this.baseUrl + 'Category/' + categoryId).pipe(timeout(this.delayTime));
+    return this.http.delete(this.baseUrl + 'Category/' + categoryId).pipe(timeout(this.delayTime)).pipe(map((category) => {
+      this.categoriesUpdated$.next(true);
+      return category;
+    })).pipe(map((category) => {
+      this.categoriesUpdated$.next(true);
+      return category;
+    }));
   }
 
 

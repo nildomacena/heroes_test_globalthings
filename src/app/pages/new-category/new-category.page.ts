@@ -179,6 +179,11 @@ export class NewCategoryPage implements OnInit {
         }
       }
       this.offlineService.saveCategoryOperation(data);
+      this.offlineService.updateCachedCategory(data.entity);
+      showToast({
+        controller: this.toastCtrl,
+        message: 'Categoria atualizada localmente!',
+      });
     } catch (error) {
       console.error(error);
       showToast({

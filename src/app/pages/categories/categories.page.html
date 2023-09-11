@@ -10,9 +10,17 @@
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+  <ion-refresher slot="fixed" (ionRefresh)="getCategories($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
+  <div *ngIf="error">
+    <ion-text color="primary" class="ion-text-center">
+      <h3>Não foi possível carregar os dados</h3>
+    </ion-text>
+  </div>
 
-  <ng-container *ngIf="!categories || categories.length <= 0; else listCategories">
+  <ng-container *ngIf="categories != undefined && categories.length <= 0; else listCategories">
     <ion-list *ngFor="let a of listLoading">
       <ion-item>
         <ion-thumbnail slot="start">

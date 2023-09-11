@@ -29,6 +29,9 @@
       <ion-title size="large">heroes</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="getHeroes($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <div class="heroes-list">
     <ng-container *ngIf="heroes.length === 0; else heroList">
       <hero-card *ngFor="let item of listLoading" [isLoading]="true"></hero-card>
